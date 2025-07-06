@@ -1,0 +1,1 @@
+`event.category : "file" and event.type : "access" and file.name : "NTDS.DIT" and (process.executable : "*\\powershell.exe" or process.executable : "*\\cmd.exe")`
