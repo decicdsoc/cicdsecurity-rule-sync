@@ -1,0 +1,64 @@
+# .github/workflows/sync-detection-rules.yml
+name: Sync Detection Rules
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v4
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Clone SlimKQL rules
+        run: |
+          rm -rf slimkql
+          git clone --depth=1 https://github.com/SlimKQL/Hunting-Queries-Detection-Rules.git slimkql
+          mkdir -p synced/SlimKQL
+          cp -r slimkql/* synced/SlimKQL/
+
+      - name: Clone Yamato rules
+        run: |
+          rm -rf hayabusa
+          git clone --depth=1 https://github.com/Yamato-Security/hayabusa-rules.git hayabusa
+          mkdir -p synced/Yamato
+          cp -r hayabusa/* synced/Yamato/
+
+      - name: Clone Elastic rules
+        run: |
+          rm -rf elastic
+          git clone --depth=1 https://github.com/elastic/detection-rules.git elastic
+          mkdir -p synced/Elastic
+          cp -r elastic/rules/* synced/Elastic/
+
+      - name: Clone Sigma rules
+        run: |
+          rm -rf sigma
+          git clone --depth=1 https://github.com/SigmaHQ/sigma.git sigma
+          mkdir -p synced/Sigma
+          cp -r sigma/rules/* synced/Sigma/
+
+      - name: Clone Sublime rules
+        run: |
+          rm -rf sublime
+          git clone --depth=1 https://github.com/sublime-security/sublime-rules.git sublime
+          mkdir -p synced/Sublime
+          cp -r sublime/* synced/Sublime/
+
+      - name: Commit and push if new rules
+        run: |
+          git add synced/
+          if ! git diff --cached --quiet; then
+            git commit -m "Sync latest detection rules"
+            git push
+          else
+            echo "No changes to commit."
+          fi
