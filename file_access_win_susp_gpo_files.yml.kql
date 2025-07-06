@@ -1,0 +1,1 @@
+`event.category : "file" and event.type : "access" and file.path : ("C:\\Windows\\System32\\GroupPolicy\\Machine\\registry.pol", "C:\\Windows\\System32\\GroupPolicy\\User\\registry.pol")`
