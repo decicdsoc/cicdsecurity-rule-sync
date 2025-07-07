@@ -3,62 +3,72 @@ name: Sync Detection Rules
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 * * * *'  # Runs at the top of every hour
   workflow_dispatch:
+
+permissions:
+  contents: write  # Required to push changes back to the repository
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your repo
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for proper diff checks
 
       - name: Set up Git user
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Clone SlimKQL rules
+      - name: Clone and sync SlimKQL rules
         run: |
-          rm -rf slimkql
-          git clone --depth=1 https://github.com/SlimKQL/Hunting-Queries-Detection-Rules.git slimkql
           mkdir -p synced/SlimKQL
-          cp -r slimkql/* synced/SlimKQL/
+          git clone --depth=1 https://github.com/SlimKQL/Hunting-Queries-Detection-Rules.git slimkql-tmp
+          rsync -a --delete slimkql-tmp/ synced/SlimKQL/
+          rm -rf slimkql-tmp
 
-      - name: Clone Yamato rules
+      - name: Clone and sync Yamato rules
         run: |
-          rm -rf hayabusa
-          git clone --depth=1 https://github.com/Yamato-Security/hayabusa-rules.git hayabusa
           mkdir -p synced/Yamato
-          cp -r hayabusa/* synced/Yamato/
+          git clone --depth=1 https://github.com/Yamato-Security/hayabusa-rules.git yamato-tmp
+          rsync -a --delete yamato-tmp/ synced/Yamato/
+          rm -rf yamato-tmp
 
-      - name: Clone Elastic rules
+      - name: Clone and sync Elastic rules
         run: |
-          rm -rf elastic
-          git clone --depth=1 https://github.com/elastic/detection-rules.git elastic
           mkdir -p synced/Elastic
-          cp -r elastic/rules/* synced/Elastic/
+          git clone --depth=1 https://github.com/elastic/detection-rules.git elastic-tmp
+          rsync -a --delete elastic-tmp/rules/ synced/Elastic/
+          rm -rf elastic-tmp
 
-      - name: Clone Sigma rules
+      - name: Clone and sync Sigma rules
         run: |
-          rm -rf sigma
-          git clone --depth=1 https://github.com/SigmaHQ/sigma.git sigma
           mkdir -p synced/Sigma
-          cp -r sigma/rules/* synced/Sigma/
+          git clone --depth=1 https://github.com/SigmaHQ/sigma.git sigma-tmp
+          rsync -a --delete sigma-tmp/rules/ synced/Sigma/
+          rm -rf sigma-tmp
 
-      - name: Clone Sublime rules
+      - name: Clone and sync Sublime rules
         run: |
-          rm -rf sublime
-          git clone --depth=1 https://github.com/sublime-security/sublime-rules.git sublime
           mkdir -p synced/Sublime
-          cp -r sublime/* synced/Sublime/
+          git clone --depth=1 https://github.com/sublime-security/sublime-rules.git sublime-tmp
+          rsync -a --delete sublime-tmp/ synced/Sublime/
+          rm -rf sublime-tmp
 
-      - name: Commit and push if new rules
+      - name: Commit and push changes
         run: |
+          # Check if there are any changes
           git add synced/
-          if ! git diff --cached --quiet; then
-            git commit -m "Sync latest detection rules"
-            git push
-          else
-            echo "No changes to commit."
+          if git diff --cached --quiet; then
+            echo "No changes detected in detection rules"
+            exit 0
           fi
+          
+          # Commit changes
+          git commit -m "chore: sync latest detection rules [automated]"
+          
+          # Push changes
+          git push
