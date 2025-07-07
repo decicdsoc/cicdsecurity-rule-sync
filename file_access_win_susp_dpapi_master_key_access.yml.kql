@@ -1,1 +1,0 @@
-`event.category : "file" and event.type : "access" and file.path : "*\\Microsoft\\Crypto\\RSA\\S-1-5-18\\*" and file.name : "master_key"`
