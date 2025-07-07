@@ -1,1 +1,0 @@
-`event.category : "file" and event.type : "access" and file.path : (*.wallet or *.kdbx or *.key or *.psk or *.dat or *.config or *.txt or *.json or *.log or *.sqlite or *.db or *.sql) and not process.executable : (C:\\Windows\\System32\\lsass.exe or C:\\Windows\\System32\\svchost.exe or C:\\Program Files\\*.exe or C:\\Windows\\explorer.exe)`
