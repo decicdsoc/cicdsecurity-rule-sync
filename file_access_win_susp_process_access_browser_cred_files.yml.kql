@@ -1,1 +1,0 @@
-`event.category : "file" and event.type : "access" and process.name : ("chrome.exe", "msedge.exe", "firefox.exe", "brave.exe", "opera.exe", "iexplore.exe", "safari.exe") and file.path : (*Credenziali*, *Login Data*, *key4.db*, *logins.json*)`
