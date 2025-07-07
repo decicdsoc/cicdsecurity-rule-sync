@@ -1,1 +1,0 @@
-`event.category : "file" and event.type : "access" and file.name : ("*.ps1", "*.vbs", "*.bat", "*.cmd", "*.reg", "*.psm1") and process.name : "Teams.exe"`
