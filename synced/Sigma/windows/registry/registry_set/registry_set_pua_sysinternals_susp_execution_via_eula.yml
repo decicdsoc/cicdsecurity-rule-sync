@@ -11,16 +11,15 @@ references:
     - https://twitter.com/Moti_B/status/1008587936735035392
 author: Nasreddine Bencherchali (Nextron Systems)
 date: 2022-08-24
-modified: 2023-02-07
+modified: 2025-10-26
 tags:
     - attack.resource-development
     - attack.t1588.002
 logsource:
     product: windows
-    category: registry_add
+    category: registry_set
 detection:
     selection:
-        EventType: CreateKey
         TargetObject|contains:
             - '\Active Directory Explorer'
             - '\Handle'
@@ -37,3 +36,4 @@ detection:
 falsepositives:
     - Legitimate use of SysInternals tools. Filter the legitimate paths used in your environment
 level: medium
+regression_tests_path: regression_data/windows/registry/registry_set/registry_set_pua_sysinternals_susp_execution_via_eula/info.yml
